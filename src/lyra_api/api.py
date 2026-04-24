@@ -74,6 +74,11 @@ class LyraAPIClient:
                 # Receive acknowledgment
                 ack_str = websocket.recv()
                 ack = json.loads(ack_str)
+
+                if ack["status"] == "error":
+                    msg = ack.get("details", "Unknown error")
+                    raise WebSocketError(f"Server error: {msg}")
+
                 if self.verbose:
                     print(f"Server acknowledged. Task ID: {ack.get('task_id')}")
 
@@ -132,6 +137,80 @@ class LyraAPIClient:
             raise
         except Exception as e:
             raise DownloadError(f"Download error: {e}") from e
+
+    def get_data_types(self) -> list[dict[str, Any]]:
+        """Fetch available data types from the API.
+
+        Returns:
+            A list of data type objects.
+
+        Raises:
+            DownloadError: If the HTTP request fails or returns an invalid payload.
+        """
+        protocol = "https" if self.secure else "http"
+        data_types_url = f"{protocol}://{self.host}/data_types"
+
+        try:
+            response = requests.get(
+                data_types_url,
+                timeout=self.timeout,
+                headers=self.headers,
+            )
+
+            if response.status_code != 200:
+                raise DownloadError(
+                    f"Failed to fetch data types. HTTP {response.status_code}"
+                )
+
+            data_types = response.json()
+            if not isinstance(data_types, list) or not all(
+                isinstance(item, dict) for item in data_types
+            ):
+                raise DownloadError("Invalid data types response format")
+
+            return data_types
+
+        except DownloadError:
+            raise
+        except Exception as e:
+            raise DownloadError(f"Data types request error: {e}") from e
+
+    def get_metrics(self) -> list[dict[str, Any]]:
+        """Fetch available metrics from the API.
+
+        Returns:
+            A list of metric objects.
+
+        Raises:
+            DownloadError: If the HTTP request fails or returns an invalid payload.
+        """
+        protocol = "https" if self.secure else "http"
+        metrics_url = f"{protocol}://{self.host}/metrics"
+
+        try:
+            response = requests.get(
+                metrics_url,
+                timeout=self.timeout,
+                headers=self.headers,
+            )
+
+            if response.status_code != 200:
+                raise DownloadError(
+                    f"Failed to fetch metrics. HTTP {response.status_code}"
+                )
+
+            metrics = response.json()
+            if not isinstance(metrics, list) or not all(
+                isinstance(item, dict) for item in metrics
+            ):
+                raise DownloadError("Invalid metrics response format")
+
+            return metrics
+
+        except DownloadError:
+            raise
+        except Exception as e:
+            raise DownloadError(f"Metrics request error: {e}") from e
 
     def process(self, metric: str, payload: dict) -> dict[str, Any]:
         """Submit a request and download the result in one call.
@@ -285,6 +364,80 @@ class AsyncLyraAPIClient:
             raise
         except Exception as e:
             raise DownloadError(f"Download error: {e}") from e
+
+    async def get_data_types(self) -> list[dict[str, Any]]:
+        """Fetch available data types from the API (async).
+
+        Returns:
+            A list of data type objects.
+
+        Raises:
+            DownloadError: If the HTTP request fails or returns an invalid payload.
+        """
+        protocol = "https" if self.secure else "http"
+        data_types_url = f"{protocol}://{self.host}/data_types"
+
+        try:
+            timeout = aiohttp.ClientTimeout(total=self.timeout)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(
+                    data_types_url,
+                    headers=self.headers,
+                ) as response:
+                    if response.status != 200:
+                        raise DownloadError(
+                            f"Failed to fetch data types. HTTP {response.status}"
+                        )
+
+                    data_types = await response.json()
+                    if not isinstance(data_types, list) or not all(
+                        isinstance(item, dict) for item in data_types
+                    ):
+                        raise DownloadError("Invalid data types response format")
+
+                    return data_types
+
+        except DownloadError:
+            raise
+        except Exception as e:
+            raise DownloadError(f"Data types request error: {e}") from e
+
+    async def get_metrics(self) -> list[dict[str, Any]]:
+        """Fetch available metrics from the API (async).
+
+        Returns:
+            A list of metric objects.
+
+        Raises:
+            DownloadError: If the HTTP request fails or returns an invalid payload.
+        """
+        protocol = "https" if self.secure else "http"
+        metrics_url = f"{protocol}://{self.host}/metrics"
+
+        try:
+            timeout = aiohttp.ClientTimeout(total=self.timeout)
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.get(
+                    metrics_url,
+                    headers=self.headers,
+                ) as response:
+                    if response.status != 200:
+                        raise DownloadError(
+                            f"Failed to fetch metrics. HTTP {response.status}"
+                        )
+
+                    metrics = await response.json()
+                    if not isinstance(metrics, list) or not all(
+                        isinstance(item, dict) for item in metrics
+                    ):
+                        raise DownloadError("Invalid metrics response format")
+
+                    return metrics
+
+        except DownloadError:
+            raise
+        except Exception as e:
+            raise DownloadError(f"Metrics request error: {e}") from e
 
     async def process(self, metric: str, payload: dict) -> dict[str, Any]:
         """Submit a request and download the result in one call (async).
