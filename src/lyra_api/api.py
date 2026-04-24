@@ -119,7 +119,7 @@ class LyraAPIClient:
             DownloadError: If the HTTP request fails.
         """
         protocol = "https" if self.secure else "http"
-        download_url = f"{protocol}://{self.host}/download-result/{download_id}"
+        download_url = f"{protocol}://{self.host}/download_result/{download_id}"
 
         try:
             response = requests.get(
@@ -344,7 +344,7 @@ class AsyncLyraAPIClient:
             DownloadError: If the HTTP request fails.
         """
         protocol = "https" if self.secure else "http"
-        download_url = f"{protocol}://{self.host}/download-result/{download_id}"
+        download_url = f"{protocol}://{self.host}/download_result/{download_id}"
 
         try:
             timeout = aiohttp.ClientTimeout(total=self.timeout)
