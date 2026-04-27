@@ -65,7 +65,7 @@ class LyraAPIClient:
                 returns an error status.
         """
         protocol = "wss" if self.secure else "ws"
-        ws_url = f"{protocol}://{self.host}/ws/{metric}/geojson"
+        ws_url = f"{protocol}://{self.host}/ws/{metric}"
 
         try:
             with connect(ws_url, additional_headers=self.headers) as websocket:
@@ -293,7 +293,7 @@ class AsyncLyraAPIClient:
                 returns an error status.
         """
         protocol = "wss" if self.secure else "ws"
-        ws_url = f"{protocol}://{self.host}/ws/{metric}/geojson"
+        ws_url = f"{protocol}://{self.host}/ws/{metric}"
 
         try:
             async with async_connect(
