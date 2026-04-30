@@ -4,11 +4,11 @@ from .api import AsyncLyraAPIClient, LyraAPIClient
 from .exceptions import DownloadError, LyraAPIError, WebSocketError
 
 __all__ = [
-    "LyraAPIClient",
     "AsyncLyraAPIClient",
+    "DownloadError",
+    "LyraAPIClient",
     "LyraAPIError",
     "WebSocketError",
-    "DownloadError",
 ]
 
 

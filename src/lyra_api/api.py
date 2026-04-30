@@ -95,7 +95,7 @@ class LyraAPIClient:
                     download_id = notification.get("download_id")
                     if self.verbose:
                         print(
-                            f"Worker finished. Received download ticket: {download_id}"
+                            f"Worker finished. Received download ticket: {download_id}",
                         )
                     return download_id
 
@@ -159,7 +159,7 @@ class LyraAPIClient:
 
             if response.status_code != 200:
                 raise DownloadError(
-                    f"Failed to fetch data types. HTTP {response.status_code}"
+                    f"Failed to fetch data types. HTTP {response.status_code}",
                 )
 
             data_types = response.json()
@@ -196,7 +196,7 @@ class LyraAPIClient:
 
             if response.status_code != 200:
                 raise DownloadError(
-                    f"Failed to fetch metrics. HTTP {response.status_code}"
+                    f"Failed to fetch metrics. HTTP {response.status_code}",
                 )
 
             metrics = response.json()
@@ -297,7 +297,8 @@ class AsyncLyraAPIClient:
 
         try:
             async with async_connect(
-                ws_url, additional_headers=self.headers
+                ws_url,
+                additional_headers=self.headers,
             ) as websocket:
                 await websocket.send(json.dumps(payload))
 
@@ -320,7 +321,7 @@ class AsyncLyraAPIClient:
                     download_id = notification.get("download_id")
                     if self.verbose:
                         print(
-                            f"Worker finished. Received download ticket: {download_id}"
+                            f"Worker finished. Received download ticket: {download_id}",
                         )
                     return download_id
 
@@ -357,7 +358,7 @@ class AsyncLyraAPIClient:
                         return await response.json()
 
                     raise DownloadError(
-                        f"Failed to download data. HTTP {response.status}"
+                        f"Failed to download data. HTTP {response.status}",
                     )
 
         except DownloadError:
@@ -386,14 +387,15 @@ class AsyncLyraAPIClient:
                 ) as response:
                     if response.status != 200:
                         raise DownloadError(
-                            f"Failed to fetch data types. HTTP {response.status}"
+                            f"Failed to fetch data types. HTTP {response.status}",
                         )
 
                     data_types = await response.json()
                     if not isinstance(data_types, list) or not all(
                         isinstance(item, dict) for item in data_types
                     ):
-                        raise DownloadError("Invalid data types response format")
+                        err = "Invalid data types response format"
+                        raise DownloadError(err)
 
                     return data_types
 
@@ -423,7 +425,7 @@ class AsyncLyraAPIClient:
                 ) as response:
                     if response.status != 200:
                         raise DownloadError(
-                            f"Failed to fetch metrics. HTTP {response.status}"
+                            f"Failed to fetch metrics. HTTP {response.status}",
                         )
 
                     metrics = await response.json()
