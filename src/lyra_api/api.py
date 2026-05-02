@@ -114,7 +114,8 @@ class LyraAPIClient(_BaseLyraAPIClient):
                 ack = json.loads(ack_str)
 
                 if ack["status"] == "error":
-                    err = f"Server error: {ack.get('details', 'Unknown error')}"
+                    message = ack.get("message", "Unknown error")
+                    err = f"Server error: {message}"
                     raise WebSocketError(err)
 
                 self._logger.info(
