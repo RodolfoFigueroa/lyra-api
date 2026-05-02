@@ -64,6 +64,7 @@ class LyraAPIClient(_BaseLyraAPIClient):
         *,
         secure: bool = True,
         log_level: int = logging.INFO,
+        connect_kwargs: dict[str, Any] | None = None,
     ) -> None:
         """Initialize the Lyra API client.
 
@@ -79,6 +80,7 @@ class LyraAPIClient(_BaseLyraAPIClient):
         self.timeout = timeout
         self.headers = headers or {}
         self.secure = secure
+        self.connect_kwargs = connect_kwargs or {}
         self._logger = logging.getLogger(__name__ + ".LyraAPIClient")
         self._logger.setLevel(log_level)
 
@@ -100,7 +102,11 @@ class LyraAPIClient(_BaseLyraAPIClient):
         ws_url = f"{protocol}://{self.host}/ws/{metric}"
 
         try:
-            with connect(ws_url, additional_headers=self.headers) as websocket:
+            with connect(
+                ws_url,
+                additional_headers=self.headers,
+                **self.connect_kwargs,
+            ) as websocket:
                 websocket.send(json.dumps(payload))
 
                 # Receive acknowledgment
